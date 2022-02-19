@@ -1,9 +1,10 @@
 package com.example.todolist
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
+import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
@@ -11,18 +12,25 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.Room
+import com.example.todolist.entities.Todo
 
 class MainActivity : AppCompatActivity() {
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
-        var TodoList = mutableListOf<Todo>(
 
-        )
 
-        val adapter = TodoAdapter(TodoList)
+        val db = Room.databaseBuilder(applicationContext,TodoDatabase::class.java,"todo-db").allowMainThreadQueries().build()
+
+        val todoDao = db.todoDao()
+        var TodoList = todoDao.getAll()
+
+
+        var adapter = TodoAdapter(todoDao.getAll())
         val rvView: RecyclerView = findViewById(R.id.rvView)
 
         rvView.adapter = adapter
@@ -36,8 +44,15 @@ class MainActivity : AppCompatActivity() {
             if (!checkNull(editText)) {
                 val title = editText.text.toString()
                 val todo = Todo(title)
-                TodoList.add(todo)
-                adapter.notifyItemInserted(TodoList.size - 1)
+                todoDao.insert(todo)
+
+
+                TodoList.forEach {
+                    Log.e("Todo", it.toString())
+                }
+                adapter = TodoAdapter(todoDao.getAll())
+                rvView.adapter = adapter
+
                 val inputManager: InputMethodManager =
                     getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 inputManager.hideSoftInputFromWindow(
@@ -51,8 +66,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-
-
     }
 
     private fun checkNull(editText: EditText): Boolean {
