@@ -30,7 +30,9 @@ class MainActivity : AppCompatActivity() {
         var TodoList = todoDao.getAll()
 
 
-        var adapter = TodoAdapter(todoDao.getAll())
+
+
+        var adapter = TodoAdapter(todoDao.getAll(),this,todoDao)
         val rvView: RecyclerView = findViewById(R.id.rvView)
 
         rvView.adapter = adapter
@@ -43,14 +45,16 @@ class MainActivity : AppCompatActivity() {
         btnAdd.setOnClickListener {
             if (!checkNull(editText)) {
                 val title = editText.text.toString()
+
                 val todo = Todo(title)
+
                 todoDao.insert(todo)
 
 
-                TodoList.forEach {
+                todoDao.getAll().forEach {
                     Log.e("Todo", it.toString())
                 }
-                adapter = TodoAdapter(todoDao.getAll())
+                adapter = TodoAdapter(todoDao.getAll(),this,todoDao)
                 rvView.adapter = adapter
 
                 val inputManager: InputMethodManager =
@@ -64,7 +68,6 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this@MainActivity, "Please input the note!", Toast.LENGTH_SHORT)
                     .show()
             }
-
         }
     }
 
