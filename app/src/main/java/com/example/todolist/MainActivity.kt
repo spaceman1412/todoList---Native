@@ -23,16 +23,14 @@ class MainActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
 
-
-        val db = Room.databaseBuilder(applicationContext,TodoDatabase::class.java,"todo-db").allowMainThreadQueries().build()
+        val db = Room.databaseBuilder(applicationContext, TodoDatabase::class.java, "todo-db")
+        .allowMainThreadQueries().build()
 
         val todoDao = db.todoDao()
         var TodoList = todoDao.getAll()
 
 
-
-
-        var adapter = TodoAdapter(todoDao.getAll(),this,todoDao)
+        var adapter = TodoAdapter(todoDao.getAll(), this, todoDao)
         val rvView: RecyclerView = findViewById(R.id.rvView)
 
         rvView.adapter = adapter
@@ -50,11 +48,10 @@ class MainActivity : AppCompatActivity() {
 
                 todoDao.insert(todo)
 
-
                 todoDao.getAll().forEach {
                     Log.e("Todo", it.toString())
                 }
-                adapter = TodoAdapter(todoDao.getAll(),this,todoDao)
+                adapter = TodoAdapter(todoDao.getAll(), this, todoDao)
                 rvView.adapter = adapter
 
                 val inputManager: InputMethodManager =
